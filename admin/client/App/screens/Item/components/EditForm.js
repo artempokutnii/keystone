@@ -126,6 +126,13 @@ var EditForm = React.createClass({
 		const editForm = this.refs.editForm;
 		const formData = new FormData(editForm);
 
+		// append to form lost relationship values
+		Object.keys(this.state.values).forEach((item) => {
+			if (this.state.values[item] === '' && formData.get(item) !== '') {
+				formData.append(item, '');
+			}
+		});
+
 		// Show loading indicator
 		this.setState({
 			loading: true,
