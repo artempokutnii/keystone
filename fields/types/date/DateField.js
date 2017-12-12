@@ -61,6 +61,9 @@ module.exports = Field.create({
 			value: this.toMoment(new Date()).format(this.props.inputFormat),
 		});
 	},
+	clearDate () {
+		this.valueChanged({value: '',});
+	},
 	renderValue () {
 		return (
 			<FormInput noedit>
@@ -87,6 +90,9 @@ module.exports = Field.create({
 				</Section>
 				<Section>
 					<Button onClick={this.setToday}>Today</Button>
+				</Section>
+				<Section>
+					<Button onClick={this.clearDate}>Clear</Button>
 				</Section>
 			</Group>
 		);
