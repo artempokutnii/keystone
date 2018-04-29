@@ -60,6 +60,9 @@ module.exports = function createDynamicRouter (keystone) {
 		router.use(keystone.get('auth'));
 	}
 
+	// Process each route by tenant user
+	router.all('/api*', require('../helpers/handleTenantScope'));
+
 	// #3: Home route
 	router.get('/', IndexRoute);
 
