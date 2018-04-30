@@ -38,12 +38,16 @@ module.exports = function (req, res) {
 			return res.apiError('database error', err);
 		}
 		async.forEachLimit(results, 10, function (item, next) {
-			item.remove(function (err) {
-				if (err) return next(err);
-				deletedCount++;
-				deletedIds.push(item.id);
-				next();
-			});
+			if (req.user.isTenant && (item.app && item.app.toString() !== req.applicationId.toString())) {
+				return res.apiError(403, 'forbidden')
+			} else {
+				item.remove(function (err) {
+					if (err) return next(err);
+					deletedCount++;
+					deletedIds.push(item.id);
+					next();
+				});
+			}
 		}, function () {
 			return res.json({
 				success: true,
