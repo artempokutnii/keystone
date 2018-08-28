@@ -2,7 +2,7 @@ var async = require('async');
 
 module.exports = function (req, res) {
 	var keystone = req.keystone;
-	if (!req.openAPI && !keystone.security.csrf.validate(req)) {
+	if (!keystone.security.csrf.validate(req)) {
 		console.log('Refusing to delete ' + req.list.key + ' items; CSRF failure');
 		return res.apiError(403, 'invalid csrf');
 	}
@@ -24,8 +24,8 @@ module.exports = function (req, res) {
 		var userId = String(req.user.id);
 		// check if user can delete this resources based on resources ids and userId
 		if (checkResourceId && ids.some(function (id) {
-			return id === userId;
-		})) {
+				return id === userId;
+			})) {
 			console.log('Refusing to delete ' + req.list.key + ' items; ids contains current User id');
 			return res.apiError(403, 'not allowed', 'You can not delete yourself');
 		}
@@ -38,16 +38,12 @@ module.exports = function (req, res) {
 			return res.apiError('database error', err);
 		}
 		async.forEachLimit(results, 10, function (item, next) {
-			if (req.user.isTenant && (item.app && item.app.toString() !== req.applicationId.toString())) {
-				return res.apiError(403, 'forbidden')
-			} else {
-				item.remove(function (err) {
-					if (err) return next(err);
-					deletedCount++;
-					deletedIds.push(item.id);
-					next();
-				});
-			}
+			item.remove(function (err) {
+				if (err) return next(err);
+				deletedCount++;
+				deletedIds.push(item.id);
+				next();
+			});
 		}, function () {
 			return res.json({
 				success: true,
